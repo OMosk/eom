@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <array>
+#include <vector>
 #include <getopt.h>
 #include <cmath>
 
@@ -26,7 +26,7 @@ public:
     }
 };
 
-void choleckiy(matrix &in, matrix &out)
+void cholesky(matrix &in, matrix &out)
 {
     for (int i = 0; i < in.dim; i++)
         for (int j = 0; j < in.dim; j++)
@@ -42,6 +42,20 @@ void choleckiy(matrix &in, matrix &out)
             for (int i = k; i < in.dim; i++)
                 in(i, k) = in(i, k) - out(i, j)*out(k, j);
     }
+}
+
+std::vector<double> 
+solve_triangle_linear_system(matrix &A, const std::vector<double> &b)
+{
+    std::vector<double> x(A.dim, 0);
+    for (int i = 0; i < A.dim; i++)
+    {
+        double b_i = b[i];
+        for (int j = 0; j < i; j++)
+            b_i -= A(i, j) * x[j];
+        x[i] = b_i / A(i, i);
+    }
+    return x;
 }
 
 void print_usage()
@@ -84,9 +98,13 @@ int main(int argc, char **argv)
     in >> dimension;
 
     matrix A(dimension), U(dimension);
+    std::vector<double> b(dimension);
     for (int i = 0; i < dimension; i++)
         for (int j = 0; j < dimension; j++)
             in >> A(i, j);
+
+    for (int i = 0; i < dimension; i++)
+        in >> b[i];
 
     for (int i = 0; i < dimension; i++)
         for (int j = i; j < dimension; j++)
@@ -96,14 +114,31 @@ int main(int argc, char **argv)
                 return 0;
             }
 
-    choleckiy(A, U);
+    cholesky(A, U);
+
     for (int i = 0; i < dimension; i++)
     {
         for (int j = 0; j < dimension; j++)
-            out << U(i, j) << ' ';
-        out << endl;
+            std::cout << U(i, j) << ' ';
+        std::cout << std::endl;
     }
 
+
+    vector<double> b2 = solve_triangle_linear_system(U, b);
+
+    std::cout << "------" << std::endl;
+    for (int i = 0; i < dimension; i++)
+        std::cout << b2[i] << std::endl;
+
+    for (int i = 0; i < dimension; i++)
+        for (int j = 0; j <= i; j++)
+            std::swap(U(i, j), U(j, i));
+
+    vector<double> x = solve_triangle_linear_system(U, b2);
+
+    std::cout << "------" << std::endl;
+    for (int i = 0; i < dimension; i++)
+        std::cout << b2[i] << std::endl;
 
     return 0;
 }
