@@ -32,10 +32,10 @@ void cholesky(matrix &in, matrix &out)
         for (int j = 0; j < in.dim; j++)
             out(i, j) = 0.;
     
-    for (int j = 0; j < in.dim - 1; j++)
+    for (int j = 0; j < in.dim; j++)
     {
         out(j, j) = sqrt(in(j, j));
-        for (int k = j; k < in.dim; k++)
+        for (int k = j + 1; k < in.dim; k++)
             out(k, j) = in(k, j) / out(j, j);
 
         for (int k = j + 1; k < in.dim; k++)
@@ -45,7 +45,7 @@ void cholesky(matrix &in, matrix &out)
 }
 
 std::vector<double> 
-solve_triangle_linear_system(matrix &A, const std::vector<double> &b)
+solve_lower_triangle_linear_system(matrix &A, const std::vector<double> &b)
 {
     std::vector<double> x(A.dim, 0);
     for (int i = 0; i < A.dim; i++)
@@ -58,13 +58,32 @@ solve_triangle_linear_system(matrix &A, const std::vector<double> &b)
     return x;
 }
 
+std::vector<double> 
+solve_upper_triangle_linear_system(matrix &A, const std::vector<double> &b)
+{
+    std::vector<double> x(A.dim, 0);
+    for (int i = A.dim - 1; i >= 0; i--)
+    {
+        double b_i = b[i];
+        for (int j = i + 1; j < A.dim; j++)
+            b_i -= A(i, j) * x[j];
+        x[i] = b_i / A(i, i);
+    }
+    return x;
+}
+
 void print_usage()
 {
     cout << "Usage: lab1 -i input.txt -o output.txt" << endl
         << "Options:" << endl
         << " --input, -i input.txt    set input file name" << endl
         << " --output, -o output.txt  set output file name" << endl
-        << " --help, -h               print this help" << endl;
+        << " --help, -h               print this help" << endl
+        << endl 
+        << "Input file format:" << endl
+        << "First line:   1 number N(dimension)" << endl
+        << "Next N lines: N numbers(Matrix)" << endl
+        << "Next N line:  1 number(coefficient vector)" << endl;
 }
 
 int main(int argc, char **argv)
@@ -115,30 +134,37 @@ int main(int argc, char **argv)
             }
 
     cholesky(A, U);
-
+/*
     for (int i = 0; i < dimension; i++)
     {
         for (int j = 0; j < dimension; j++)
             std::cout << U(i, j) << ' ';
         std::cout << std::endl;
     }
+*/
 
-
-    vector<double> b2 = solve_triangle_linear_system(U, b);
-
+    vector<double> b2 = solve_lower_triangle_linear_system(U, b);
+/*
     std::cout << "------" << std::endl;
     for (int i = 0; i < dimension; i++)
         std::cout << b2[i] << std::endl;
-
+*/
     for (int i = 0; i < dimension; i++)
         for (int j = 0; j <= i; j++)
             std::swap(U(i, j), U(j, i));
-
-    vector<double> x = solve_triangle_linear_system(U, b2);
-
-    std::cout << "------" << std::endl;
+/*
     for (int i = 0; i < dimension; i++)
-        std::cout << b2[i] << std::endl;
+    {
+        for (int j = 0; j < dimension; j++)
+            std::cout << U(i, j) << ' ';
+        std::cout << std::endl;
+    }
+*/
+    vector<double> x = solve_upper_triangle_linear_system(U, b2);
+
+    //std::cout << "------" << std::endl;
+    for (int i = 0; i < dimension; i++)
+        out << x[i] << std::endl;
 
     return 0;
 }

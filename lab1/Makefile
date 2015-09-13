@@ -1,2 +1,2 @@
 b:
-	g++ -std=c++0x main.cpp -o lab1
+	g++ -std=c++0x -g -O0 main.cpp -o lab1
