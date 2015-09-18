@@ -74,7 +74,8 @@ solve_upper_triangle_linear_system(matrix &A, const std::vector<double> &b)
 
 void print_usage()
 {
-    cout << "Usage: lab1 -i input.txt -o output.txt" << endl
+    cout << "Purpose: solving system of linear equations using Cholesky decomposition" << endl
+        << "Usage: lab1 -i input.txt -o output.txt" << endl
         << "Options:" << endl
         << " --input, -i input.txt    set input file name" << endl
         << " --output, -o output.txt  set output file name" << endl
